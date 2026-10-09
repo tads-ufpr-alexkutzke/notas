@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Notas de DS122 (TADSN2A)</title>
+<style>
+:root {
+  color-scheme: light;
+  --papel: #f1f2ee;
+  --cartao: #ffffff;
+  --tinta: #1a211d;
+  --tinta-fraca: #5d665f;
+  --linha: #d9dcd4;
+  --quadro: #22392f;
+  --giz: #edeee6;
+  --giz-fraco: #a8b6ab;
+  --ok: #1c7146;
+  --ok-fundo: #e2f0e6;
+  --atencao: #8f5b06;
+  --atencao-fundo: #f7ecd6;
+  --risco: #a92832;
+  --risco-fundo: #f7e2e2;
+  --neutro-fundo: #e8eae4;
+  --raio: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --papel: #141815;
+    --cartao: #1c221e;
+    --tinta: #e6e9e3;
+    --tinta-fraca: #97a199;
+    --linha: #2c332d;
+    --quadro: #1b2c25;
+    --giz: #e6e9e3;
+    --giz-fraco: #8fa295;
+    --ok: #5fbd8b;
+    --ok-fundo: #17301f;
+    --atencao: #dfa646;
+    --atencao-fundo: #33270f;
+    --risco: #e8797f;
+    --risco-fundo: #35191c;
+    --neutro-fundo: #232a25;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+header { background: var(--quadro); color: var(--giz); padding: 20px 16px; }
+header h1 { margin: 0; font-size: 1.25rem; }
+header p { margin: 4px 0 0; color: var(--giz-fraco); font-size: .9rem; }
+main { max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; }
+.cartao {
+  background: var(--cartao);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+form label { display: block; font-weight: 600; margin: 12px 0 4px; }
+form label:first-child { margin-top: 0; }
+input {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  color: inherit;
+  background: var(--papel);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+}
+button {
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: var(--raio);
+  background: var(--quadro);
+  color: var(--giz);
+  cursor: pointer;
+}
+button[disabled] { opacity: .6; cursor: progress; }
+form button { margin-top: 16px; width: 100%; }
+.aviso { margin: 12px 0 0; min-height: 1.5em; color: var(--risco); }
+.aviso.neutro { color: var(--tinta-fraca); }
+.fraco { color: var(--tinta-fraca); font-size: .9rem; }
+.topo { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.topo h2 { margin: 0; font-size: 1.1rem; }
+.topo button { background: transparent; color: var(--tinta-fraca); padding: 4px 0; font-weight: 400; text-decoration: underline; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+th { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: var(--tinta-fraca); font-weight: 600; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+tr.bloco td { font-size: .9rem; padding-top: 4px; padding-bottom: 4px; }
+tr.bloco td:first-child { padding-left: 20px; }
+tr.obs td { border-bottom: 1px solid var(--linha); padding-top: 0; color: var(--tinta-fraca); font-size: .9rem; white-space: pre-wrap; }
+tr.tem-obs td { border-bottom: 0; }
+.selo {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: .8rem;
+  font-weight: 600;
+  background: var(--neutro-fundo);
+  color: var(--tinta-fraca);
+}
+.selo.ok { background: var(--ok-fundo); color: var(--ok); }
+.selo.atencao { background: var(--atencao-fundo); color: var(--atencao); }
+.selo.risco { background: var(--risco-fundo); color: var(--risco); }
+.resumo { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.resumo div { background: var(--papel); border-radius: var(--raio); padding: 10px 12px; }
+.resumo dt { font-size: .8rem; color: var(--tinta-fraca); text-transform: uppercase; letter-spacing: .03em; }
+.resumo dd { margin: 2px 0 0; font-size: 1.4rem; font-weight: 700; }
+.resumo dd small { display: block; font-size: .85rem; font-weight: 400; color: var(--tinta-fraca); }
+details summary { cursor: pointer; font-weight: 600; }
+details[open] summary { margin-bottom: 8px; }
+.selo.abonada { background: var(--neutro-fundo); color: var(--tinta); }
+footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--tinta-fraca); font-size: .85rem; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Notas de DS122 (TADSN2A)</h1>
+  <p>DESENVOLVIMENTO WEB I, 2º Semestre de 2026. ALEXANDER ROBERT KUTZKE</p>
+</header>
+
+<main>
+  <form id="entrar" class="cartao" autocomplete="on">
+    <label for="grr">GRR</label>
+    <input id="grr" name="username" autocomplete="username" autocapitalize="characters" spellcheck="false" required placeholder="GRR20251234">
+    <label for="senha">Senha</label>
+    <input id="senha" name="password" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" required>
+    <button type="submit">Ver minhas notas</button>
+    <p id="aviso" class="aviso" role="status"></p>
+  </form>
+
+  <section id="boletim" hidden>
+    <div class="cartao">
+      <div class="topo">
+        <h2 id="nome"></h2>
+        <button id="sair" type="button">Sair</button>
+      </div>
+      <p class="fraco" id="atualizado"></p>
+      <dl class="resumo" id="resumo"></dl>
+      <p id="explicacao"></p>
+    </div>
+
+    <div class="cartao">
+      <table>
+        <thead><tr><th>Avaliação</th><th class="num">Peso</th><th class="num">Nota</th></tr></thead>
+        <tbody id="avaliacoes"></tbody>
+      </table>
+    </div>
+
+    <details class="cartao" id="frequencia">
+      <summary id="resumo-frequencia"></summary>
+      <table>
+        <thead><tr><th>Aula</th><th class="num">Presença</th></tr></thead>
+        <tbody id="aulas"></tbody>
+      </table>
+    </details>
+
+    <p class="fraco" id="regra"></p>
+  </section>
+</main>
+
+<footer>
+  Página informativa. As notas oficiais são as registradas no SIGA ao final do semestre.
+  Esqueceu a senha? Peça ao professor da disciplina.
+</footer>
+
+<script id="config" type="application/json">{"sal":"3f365f74e942f6968c5a7bc27336835f","iteracoes":600000}</script>
+<script>
+(() => {
+  "use strict";
+
+  
+  
+  const cfg = JSON.parse(document.getElementById("config").textContent);
+  const enc = new TextEncoder();
+  const $ = (id) => document.getElementById(id);
+
+  function normalizarGRR(s) {
+    s = s.replace(/\s+/g, "").toUpperCase();
+    return s.startsWith("GRR") ? s : "GRR" + s;
+  }
+
+  function normalizarSenha(s) {
+    let out = "";
+    for (const ch of s.toLowerCase()) {
+      if (ch === "o") out += "0";
+      else if (ch === "i" || ch === "l") out += "1";
+      else if (/^[0-9a-z]$/.test(ch)) out += ch;
+    }
+    return out;
+  }
+
+  async function derivar(grr, senha) {
+    const base = await crypto.subtle.importKey("raw", enc.encode(senha), "PBKDF2", false, ["deriveBits"]);
+    const mestra = await crypto.subtle.deriveBits(
+      { name: "PBKDF2", hash: "SHA-256", salt: enc.encode(cfg.sal + "|" + grr), iterations: cfg.iteracoes },
+      base, 256);
+    const hmac = await crypto.subtle.importKey("raw", mestra, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const chave = await crypto.subtle.sign("HMAC", hmac, enc.encode("diario-chave"));
+    const id = new Uint8Array(await crypto.subtle.sign("HMAC", hmac, enc.encode("diario-id"))).slice(0, 16);
+    return { chave, id: Array.from(id, (b) => b.toString(16).padStart(2, "0")).join("") };
+  }
+
+  
+  
+  
+  async function buscar(grr, senha) {
+    const { chave, id } = await derivar(grr, senha);
+    const r = await fetch("dados/" + id + ".bin", { cache: "no-store" });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error("o servidor respondeu " + r.status);
+    const dados = new Uint8Array(await r.arrayBuffer());
+    const k = await crypto.subtle.importKey("raw", chave, "AES-GCM", false, ["decrypt"]);
+    let claro;
+    try {
+      claro = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: dados.slice(0, 12), additionalData: enc.encode(id) }, k, dados.slice(12));
+    } catch {
+      return null;
+    }
+    return JSON.parse(new TextDecoder().decode(claro));
+  }
+
+  function el(tag, classe, texto) {
+    const e = document.createElement(tag);
+    if (classe) e.className = classe;
+    if (texto !== undefined && texto !== null) e.textContent = texto;
+    return e;
+  }
+
+  const rotulos = {
+    nao_entregue: "não entregue",
+    dispensada: "dispensada",
+    aguardando: "aguardando",
+    prevista: "prevista",
+  };
+
+  function celulaNota(it) {
+    const td = el("td", "num");
+    if (it.estado === "lancada") {
+      td.textContent = it.nota + " / " + it.maximo;
+    } else if (it.estado === "nao_entregue") {
+      td.append(it.nota + " / " + it.maximo + " ", el("span", "selo risco", rotulos.nao_entregue));
+    } else {
+      td.append(el("span", "selo", rotulos[it.estado] || it.estado));
+    }
+    return td;
+  }
+
+  function linhas(corpo, it, bloco) {
+    const tr = el("tr", bloco ? "bloco" : "");
+    const nome = el("td");
+    nome.append(el(bloco ? "span" : "strong", "", it.nome));
+    if (it.data) nome.append(el("div", "fraco", it.data));
+    tr.append(nome, el("td", "num", it.peso || ""), celulaNota(it));
+    corpo.append(tr);
+    if (it.observacao) {
+      tr.classList.add("tem-obs");
+      const obs = el("tr", "obs");
+      const td = el("td", "", it.observacao);
+      td.colSpan = 3;
+      obs.append(td);
+      corpo.append(obs);
+    }
+    for (const b of it.blocos || []) linhas(corpo, b, true);
+  }
+
+  const presencas = {
+    presente: ["presente", "ok"],
+    parcial: ["falta parcial", "atencao"],
+    justificada: ["falta justificada", "atencao"],
+    falta: ["falta", "risco"],
+    abonada: ["falta abonada", "abonada"],
+  };
+
+  function linhaAula(corpo, a) {
+    const tr = el("tr");
+    const aula = el("td");
+    aula.append(el("strong", "", a.data));
+    if (a.tema) aula.append(el("div", "fraco", a.tema));
+    const [rotulo, classe] = presencas[a.estado] || [a.estado, ""];
+    const td = el("td", "num");
+    td.append(el("span", "selo " + classe, rotulo));
+    if (a.falta && a.falta < a.horas) td.append(el("div", "fraco", a.falta + " h de " + a.horas + " h"));
+    tr.append(aula, td);
+    corpo.append(tr);
+  }
+
+  function caixa(titulo, valor, detalhe) {
+    const d = el("div");
+    const dd = el("dd", "", valor);
+    if (detalhe) dd.append(" ", el("small", "", detalhe));
+    d.append(el("dt", "", titulo), dd);
+    return d;
+  }
+
+  function mostrar(b) {
+    $("nome").textContent = b.nome + " (" + b.grr + ")";
+    $("atualizado").textContent = "Atualizado em " + b.atualizado + ".";
+
+    const resumo = $("resumo");
+    resumo.replaceChildren();
+    resumo.append(caixa("Média", b.media || "sem nota", b.media && b.parcial ? "parcial" : ""));
+    if (b.exame && b.exame.estado === "lancada") resumo.append(caixa("Exame", b.exame.nota));
+    if (b.final) resumo.append(caixa("Nota final", b.final));
+    const f = b.frequencia;
+    resumo.append(caixa("Frequência", f.percentual + "%",
+      f.horas_falta + " h de falta, limite " + f.limite + " h"));
+    const sit = caixa("Situação", "");
+    sit.querySelector("dd").replaceChildren(el("span", "selo " + b.classe, b.situacao));
+    resumo.append(sit);
+
+    $("explicacao").textContent = b.explicacao || "";
+
+    const corpo = $("avaliacoes");
+    corpo.replaceChildren();
+    for (const it of b.avaliacoes || []) linhas(corpo, it, false);
+    if (b.exame) linhas(corpo, Object.assign({}, b.exame, { nome: b.exame.nome + " (exame)" }), false);
+
+    const aulas = f.aulas || [];
+    const faltas = aulas.filter((a) => a.falta > 0).length;
+    $("resumo-frequencia").textContent = "Registro de presença: " + aulas.length +
+      (aulas.length === 1 ? " aula" : " aulas") + ", " + faltas + " com falta";
+    const corpoAulas = $("aulas");
+    corpoAulas.replaceChildren();
+    for (const a of aulas) linhaAula(corpoAulas, a);
+    $("frequencia").hidden = aulas.length === 0;
+
+    $("regra").textContent = b.regra;
+    $("entrar").hidden = true;
+    $("boletim").hidden = false;
+  }
+
+  $("entrar").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const aviso = $("aviso");
+    const botao = ev.target.querySelector("button");
+    const grr = normalizarGRR($("grr").value);
+    const senha = normalizarSenha($("senha").value);
+    if (grr === "GRR" || senha === "") return;
+
+    if (!window.crypto || !crypto.subtle) {
+      aviso.className = "aviso";
+      aviso.textContent = "Este navegador não tem o recurso de criptografia necessário. Abra a página pelo endereço https.";
+      return;
+    }
+    botao.disabled = true;
+    aviso.className = "aviso neutro";
+    aviso.textContent = "Conferindo...";
+    try {
+      const b = await buscar(grr, senha);
+      if (!b) {
+        aviso.className = "aviso";
+        aviso.textContent = "GRR ou senha não conferem.";
+        return;
+      }
+      $("senha").value = "";
+      aviso.textContent = "";
+      mostrar(b);
+    } catch (e) {
+      aviso.className = "aviso";
+      aviso.textContent = "Não foi possível carregar as notas: " + e.message;
+    } finally {
+      botao.disabled = false;
+    }
+  });
+
+  $("sair").addEventListener("click", () => {
+    $("avaliacoes").replaceChildren();
+    $("aulas").replaceChildren();
+    $("frequencia").open = false;
+    $("resumo").replaceChildren();
+    $("boletim").hidden = true;
+    $("entrar").hidden = false;
+    $("senha").focus();
+  });
+})();
+</script>
+</body>
+</html>
