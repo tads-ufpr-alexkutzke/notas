@@ -121,6 +121,8 @@ tr.tem-obs td { border-bottom: 0; }
 .resumo dd small { display: block; font-size: .85rem; font-weight: 400; color: var(--tinta-fraca); }
 details summary { cursor: pointer; font-weight: 600; }
 details[open] summary { margin-bottom: 8px; }
+tr.obs details summary { font-weight: 400; width: max-content; }
+tr.obs details[open] summary { margin-bottom: 4px; }
 .selo.abonada { background: var(--neutro-fundo); color: var(--tinta); }
 .cartao > h2 { margin: 0 0 8px; font-size: 1.1rem; }
 .rolagem { overflow-x: auto; }
@@ -286,10 +288,15 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
     if (it.data) nome.append(el("div", "fraco", it.data));
     tr.append(nome, el("td", "num", it.peso || ""), celulaNota(it));
     corpo.append(tr);
+    
+    
     if (it.observacao) {
       tr.classList.add("tem-obs");
       const obs = el("tr", "obs");
-      const td = el("td", "", it.observacao);
+      const td = el("td");
+      const det = el("details");
+      det.append(el("summary", "", "Observação"), el("div", "", it.observacao));
+      td.append(det);
       td.colSpan = 3;
       obs.append(td);
       corpo.append(obs);
