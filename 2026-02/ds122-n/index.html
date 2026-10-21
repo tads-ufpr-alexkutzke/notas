@@ -121,7 +121,17 @@ tr.tem-obs td { border-bottom: 0; }
 .resumo dd small { display: block; font-size: .85rem; font-weight: 400; color: var(--tinta-fraca); }
 details summary { cursor: pointer; font-weight: 600; }
 details[open] summary { margin-bottom: 8px; }
+tr.obs details summary { font-weight: 400; width: max-content; }
+tr.obs details[open] summary { margin-bottom: 4px; }
 .selo.abonada { background: var(--neutro-fundo); color: var(--tinta); }
+.cartao > h2 { margin: 0 0 8px; font-size: 1.1rem; }
+.rolagem { overflow-x: auto; }
+table.linha th, table.linha td { text-align: right; white-space: nowrap; }
+table.linha th:last-child, table.linha td:last-child { text-align: left; }
+table.linha td { border-bottom: 0; font-variant-numeric: tabular-nums; }
+.t-risco { color: var(--risco); }
+.t-atencao { color: var(--atencao); }
+.t-fraco { color: var(--tinta-fraca); }
 footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--tinta-fraca); font-size: .85rem; }
 [hidden] { display: none !important; }
 </style>
@@ -151,6 +161,17 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
       <p class="fraco" id="atualizado"></p>
       <dl class="resumo" id="resumo"></dl>
       <p id="explicacao"></p>
+    </div>
+
+    <div class="cartao">
+      <h2>Boletim</h2>
+      <div class="rolagem">
+        <table class="linha">
+          <thead><tr id="linha-cabecalho"></tr></thead>
+          <tbody><tr id="linha-notas"></tr></tbody>
+        </table>
+      </div>
+      <p class="fraco" id="linha-legenda" hidden>O asterisco marca média parcial: ainda falta lançar nota de avaliação já aplicada.</p>
     </div>
 
     <div class="cartao">
@@ -267,10 +288,15 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
     if (it.data) nome.append(el("div", "fraco", it.data));
     tr.append(nome, el("td", "num", it.peso || ""), celulaNota(it));
     corpo.append(tr);
+    
+    
     if (it.observacao) {
       tr.classList.add("tem-obs");
       const obs = el("tr", "obs");
-      const td = el("td", "", it.observacao);
+      const td = el("td");
+      const det = el("details");
+      det.append(el("summary", "", "Observação"), el("div", "", it.observacao));
+      td.append(det);
       td.colSpan = 3;
       obs.append(td);
       corpo.append(obs);
@@ -299,6 +325,62 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
     corpo.append(tr);
   }
 
+  
+  
+  function marca(classe, texto) {
+    return el("span", classe, texto);
+  }
+
+  function celulaResumo(it) {
+    const td = el("td");
+    switch (it.estado) {
+      case "lancada": td.textContent = it.nota; break;
+      case "nao_entregue": td.append(marca("t-risco", it.nota)); break;
+      case "dispensada": td.append(marca("t-fraco", "disp")); break;
+      case "aguardando": td.append(marca("t-atencao", "-")); break;
+      default: td.append(marca("t-fraco", "-"));
+    }
+    return td;
+  }
+
+  function linhaResumo(b) {
+    const cab = $("linha-cabecalho");
+    const val = $("linha-notas");
+    cab.replaceChildren();
+    val.replaceChildren();
+    const coluna = (titulo, celula, nome) => {
+      const th = el("th", "", titulo);
+      if (nome) th.title = nome;
+      cab.append(th);
+      val.append(celula);
+    };
+    for (const it of b.avaliacoes || []) coluna(it.id.toUpperCase(), celulaResumo(it), it.nome);
+
+    const media = el("td");
+    if (!b.media) media.append(marca("t-fraco", "-"));
+    else if (b.parcial) media.append(marca("t-atencao", b.media + "*"));
+    else media.textContent = b.media;
+    coluna("Média", media);
+
+    if (b.exame) {
+      const exame = el("td");
+      if (b.exame.estado === "lancada") exame.textContent = b.exame.nota;
+      else if (b.necessaria) exame.append(marca("t-atencao", "precisa " + b.necessaria));
+      else exame.append(marca("t-fraco", "-"));
+      coluna("Exame", exame);
+      const final = el("td");
+      if (b.final) final.textContent = b.final;
+      else final.append(marca("t-fraco", "-"));
+      coluna("Final", final);
+    }
+
+    coluna("Freq", el("td", "", b.frequencia.percentual + "%"));
+    const sit = el("td");
+    sit.append(el("span", "selo " + b.classe, b.situacao));
+    coluna("Situação", sit);
+    $("linha-legenda").hidden = !(b.media && b.parcial);
+  }
+
   function caixa(titulo, valor, detalhe) {
     const d = el("div");
     const dd = el("dd", "", valor);
@@ -324,6 +406,7 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
     resumo.append(sit);
 
     $("explicacao").textContent = b.explicacao || "";
+    linhaResumo(b);
 
     const corpo = $("avaliacoes");
     corpo.replaceChildren();
@@ -380,6 +463,8 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
 
   $("sair").addEventListener("click", () => {
     $("avaliacoes").replaceChildren();
+    $("linha-cabecalho").replaceChildren();
+    $("linha-notas").replaceChildren();
     $("aulas").replaceChildren();
     $("frequencia").open = false;
     $("resumo").replaceChildren();
