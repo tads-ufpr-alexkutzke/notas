@@ -267,6 +267,7 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
     dispensada: "dispensada",
     aguardando: "aguardando",
     prevista: "prevista",
+    parcial: "parcial",
   };
 
   function celulaNota(it) {
@@ -275,6 +276,11 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
       td.textContent = it.nota + " / " + it.maximo;
     } else if (it.estado === "nao_entregue") {
       td.append(it.nota + " / " + it.maximo + " ", el("span", "selo risco", rotulos.nao_entregue));
+    } else if (it.estado === "parcial") {
+      
+      
+      td.append(it.nota + " / " + it.maximo_parcial + " ", el("span", "selo", rotulos.parcial));
+      td.append(el("div", "fraco", "de " + it.maximo + " no total"));
     } else {
       td.append(el("span", "selo", rotulos[it.estado] || it.estado));
     }
@@ -338,6 +344,7 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
       case "nao_entregue": td.append(marca("t-risco", it.nota)); break;
       case "dispensada": td.append(marca("t-fraco", "disp")); break;
       case "aguardando": td.append(marca("t-atencao", "-")); break;
+      case "parcial": td.textContent = it.nota + "/" + it.maximo_parcial; break;
       default: td.append(marca("t-fraco", "-"));
     }
     return td;
@@ -361,6 +368,10 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
     else if (b.parcial) media.append(marca("t-atencao", b.media + "*"));
     else media.textContent = b.media;
     coluna("Média", media);
+    if (b.pontos) {
+      coluna("Pontos", el("td", "", b.pontos), "média já garantida, com zero no que falta");
+      coluna("Máx.", el("td", "", b.maximo), "média com nota máxima no que falta");
+    }
 
     if (b.exame) {
       const exame = el("td");
@@ -396,11 +407,19 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
     const resumo = $("resumo");
     resumo.replaceChildren();
     resumo.append(caixa("Média", b.media || "sem nota", b.media && b.parcial ? "parcial" : ""));
+    
+    
+    if (b.pontos) {
+      resumo.append(caixa("Pontos garantidos", b.pontos, "até " + b.maximo + " com nota máxima no que falta"));
+    }
     if (b.exame && b.exame.estado === "lancada") resumo.append(caixa("Exame", b.exame.nota));
     if (b.final) resumo.append(caixa("Nota final", b.final));
     const f = b.frequencia;
-    resumo.append(caixa("Frequência", f.percentual + "%",
-      f.horas_falta + " h de falta, limite " + f.limite + " h"));
+    let detalheFreq = f.horas_falta + " h de falta, limite " + f.limite + " h";
+    if (f.pode_faltar === 0) detalheFreq += "; a próxima falta reprova";
+    else if (f.pode_faltar === 1) detalheFreq += "; pode faltar a mais 1 aula";
+    else if (f.pode_faltar > 1) detalheFreq += "; pode faltar a mais " + f.pode_faltar + " aulas";
+    resumo.append(caixa("Frequência", f.percentual + "%", detalheFreq));
     const sit = caixa("Situação", "");
     sit.querySelector("dd").replaceChildren(el("span", "selo " + b.classe, b.situacao));
     resumo.append(sit);
