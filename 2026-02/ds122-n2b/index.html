@@ -161,6 +161,7 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
       <p class="fraco" id="atualizado"></p>
       <dl class="resumo" id="resumo"></dl>
       <p id="explicacao"></p>
+      <p class="fraco" id="aviso-frequencia" hidden></p>
     </div>
 
     <div class="cartao">
@@ -417,6 +418,7 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
     if (b.final) resumo.append(caixa("Nota final", b.final));
     const f = b.frequencia;
     let detalheFreq = f.horas_falta + " h de falta, limite " + f.limite + " h";
+    if (f.carga_prevista) detalheFreq += ", sobre as " + f.carga_prevista + " h previstas";
     if (f.pode_faltar === 0) detalheFreq += "; a próxima falta reprova";
     else if (f.pode_faltar === 1) detalheFreq += "; pode faltar a mais 1 aula";
     else if (f.pode_faltar > 1) detalheFreq += "; pode faltar a mais " + f.pode_faltar + " aulas";
@@ -426,6 +428,10 @@ footer { max-width: 720px; margin: 0 auto; padding: 0 16px 32px; color: var(--ti
     resumo.append(sit);
 
     $("explicacao").textContent = b.explicacao || "";
+    
+    
+    $("aviso-frequencia").textContent = f.aviso || "";
+    $("aviso-frequencia").hidden = !f.aviso;
     linhaResumo(b);
 
     const corpo = $("avaliacoes");
